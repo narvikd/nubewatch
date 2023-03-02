@@ -1,0 +1,30 @@
+name: "Release"
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  releases-matrix:
+    name: Release Go Binary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # build and publish in parallel: linux/amd64, darwin/amd64
+        goos: [linux, darwin]
+        goarch: [amd64]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: wangyoucao577/go-release-action@v1.35
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          asset_name: nubewatch_${{ matrix.goos }}
+          executable_compression: upx --lzma
+          ldflags: "-w -s"
+          md5sum: TRUE
+          sha256sum: TRUE
+          extra_files: LICENSE.md README.md docker-compose.yml dockerfile _dockerfiletocheckfordataraces
+          retry: 10
+          overwrite: true

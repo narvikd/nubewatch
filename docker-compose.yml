@@ -1,0 +1,34 @@
+version: "3.9"
+
+networks:
+  nubewatch:
+    external: false
+
+services:
+  bootstrap-node:
+    image: nubewatch:latest
+    hostname: bootstrap-node
+    ports:
+      - '3001:3003'
+      - '8080:80'
+    volumes:
+      - ./data:/app/data
+    restart: on-failure
+  node-test:
+    image: nubewatch:latest
+    hostname: node-test
+    ports:
+      - '3002:3003'
+      - '8081:80'
+    volumes:
+      - ./data:/app/data
+    restart: on-failure
+  node:
+    image: nubewatch:latest
+    volumes:
+      - ./data:/app/data
+    restart: on-failure
+    depends_on:
+      - bootstrap-node
+    deploy:
+      replicas: 2
