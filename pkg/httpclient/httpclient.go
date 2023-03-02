@@ -55,7 +55,7 @@ func newResponse(statusCode int, err error, body []byte) Response {
 	return res
 }
 
-func (r *Request) Do() Response {
+func (r *Request) Do(returnBody bool) Response {
 	errVal := r.validateParams()
 	if errVal != nil {
 		return newResponse(http.StatusBadRequest, errVal, nil)
@@ -98,12 +98,15 @@ func (r *Request) Do() Response {
 		_ = Body.Close() // Safe to ignore. GOSEC G307
 	}(res.Body)
 
-	resBody, errBody := getBody(res.Body)
-	if errBody != nil {
-		return newResponse(res.StatusCode, errBody, nil)
+	if returnBody {
+		resBody, errBody := getBody(res.Body)
+		if errBody != nil {
+			return newResponse(res.StatusCode, errBody, nil)
+		}
+		return newResponse(res.StatusCode, nil, resBody)
 	}
 
-	return newResponse(res.StatusCode, nil, resBody)
+	return newResponse(res.StatusCode, nil, nil)
 }
 
 // newClient returns a pointer to a new client which has all timeouts set to timeout,

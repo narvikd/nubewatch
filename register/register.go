@@ -77,7 +77,7 @@ func CheckServer(consensus *raft.Raft, server registermodel.Server) {
 			RestMethod: "GET",
 			Timeout:    3 * time.Second,
 		}
-		res := httpReq.Do()
+		res := httpReq.Do(false)
 		if res.Err != nil {
 			currentTry++
 			log.Printf("server %s. Request failed attempt: %v. Err: %v\n", server.ID, currentTry, res.Err)
